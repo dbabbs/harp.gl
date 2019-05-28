@@ -1,4 +1,5 @@
 {
+    "definitions": [{ "name": "parkColor", "value": "#6C9478" }],
     "sky": {
         "type": "gradient",
         "colorTop": "#015EBB",
@@ -824,7 +825,7 @@
                 "when": "$layer ^= 'landuse' && (($geometryType ^= 'polygon') && kind in ['nature','forest','park','wood','natural_wood','grass','meadow','village_green','dog_park','garden','nature_reserve','protected_area'])",
                 "technique": "fill",
                 "attr": {
-                    "color": "#6C9478"
+                    "color": { "$ref": "parkColor" }
                 },
                 "renderOrder": 0.2
             },
