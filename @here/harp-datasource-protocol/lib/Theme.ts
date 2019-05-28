@@ -62,6 +62,11 @@ export interface Theme {
     fog?: Fog;
 
     /**
+     * The definitions exported by these theme.
+     */
+    definitions?: Definitions;
+
+    /**
      * Map styles available for datasources used to render the map.
      */
     styles?: Styles;
@@ -90,6 +95,28 @@ export interface Theme {
      * Optional list of [[ThemePoiTableDef]]s.
      */
     poiTables?: PoiTableRef[];
+}
+
+/**
+ * An array of [[Definition]]s.
+ */
+export type Definitions = Definition[];
+
+/**
+ * A style definition.
+ */
+export type Definition = ValueDefinition;
+
+export interface ValueDefinition<T = unknown> {
+    /**
+     * The name of the definition.
+     */
+    name: string;
+
+    /**
+     * The value of the definition.
+     */
+    value: T;
 }
 
 /**
@@ -202,13 +229,35 @@ export type Style =
     | NoneStyle;
 
 /**
+ * A reference to a style definition.
+ */
+export interface Reference {
+    $ref: string;
+}
+
+/**
+ * Checks if the given value is a reference to a definition.
+ *
+ * @param value The value of a technique property.
+ */
+export function isReference(value: any): value is Reference {
+    const ref: Partial<Reference> = value;
+    return ref !== undefined && typeof ref.$ref === "string";
+}
+
+/**
+ * The attributes of a technique.
+ */
+export type Attr<T> = { [P in keyof T]?: T[P] | Reference };
+
+/**
  * Render feature as set of squares rendered in screen space.
  *
  * @see [[PointTechniqueParams]].
  */
 export interface SquaresStyle extends BaseStyle {
     technique: "squares";
-    attr?: Partial<PointTechniqueParams>;
+    attr?: Attr<PointTechniqueParams>;
 }
 
 /**
@@ -218,7 +267,7 @@ export interface SquaresStyle extends BaseStyle {
  */
 export interface CirclesStyle extends BaseStyle {
     technique: "circles";
-    attr?: Partial<PointTechniqueParams>;
+    attr?: Attr<PointTechniqueParams>;
 }
 
 /**
@@ -228,7 +277,7 @@ export interface CirclesStyle extends BaseStyle {
  */
 export interface PoiStyle extends BaseStyle {
     technique: "labeled-icon";
-    attr?: Partial<MarkerTechniqueParams>;
+    attr?: Attr<MarkerTechniqueParams>;
 }
 
 /**
@@ -238,7 +287,7 @@ export interface PoiStyle extends BaseStyle {
  */
 export interface LineMarkerStyle extends BaseStyle {
     technique: "line-marker";
-    attr?: Partial<MarkerTechniqueParams>;
+    attr?: Attr<MarkerTechniqueParams>;
 }
 
 /**
@@ -247,7 +296,7 @@ export interface LineMarkerStyle extends BaseStyle {
 export interface LineStyle extends BaseStyle {
     technique: "line";
     secondaryRenderOrder?: number;
-    attr?: Partial<MarkerTechniqueParams>;
+    attr?: Attr<MarkerTechniqueParams>;
 }
 
 /**
@@ -255,45 +304,45 @@ export interface LineStyle extends BaseStyle {
  */
 export interface SegmentsStyle extends BaseStyle {
     technique: "segments";
-    attr?: Partial<SegmentsTechniqueParams>;
+    attr?: Attr<SegmentsTechniqueParams>;
 }
 
 export interface SolidLineStyle extends BaseStyle {
     technique: "solid-line";
     secondaryRenderOrder?: number;
-    attr?: Partial<SolidLineTechniqueParams>;
+    attr?: Attr<SolidLineTechniqueParams>;
 }
 
 export interface DashedLineStyle extends BaseStyle {
     technique: "dashed-line";
-    attr?: Partial<DashedLineTechniqueParams>;
+    attr?: Attr<DashedLineTechniqueParams>;
 }
 
 export interface FillStyle extends BaseStyle {
     technique: "fill";
-    attr?: Partial<FillTechniqueParams>;
+    attr?: Attr<FillTechniqueParams>;
 }
 
 export interface StandardStyle extends BaseStyle {
     technique: "standard";
-    attr?: Partial<StandardTechniqueParams>;
+    attr?: Attr<StandardTechniqueParams>;
 }
 
 export interface TerrainStyle extends BaseStyle {
     technique: "terrain";
-    attr?: Partial<TerrainTechniqueParams>;
+    attr?: Attr<TerrainTechniqueParams>;
 }
 
 export interface BasicExtrudedLineStyle extends BaseStyle {
     technique: "extruded-line";
     shading?: "basic";
-    attr?: Partial<BasicExtrudedLineTechniqueParams>;
+    attr?: Attr<BasicExtrudedLineTechniqueParams>;
 }
 
 export interface StandardExtrudedLineStyle extends BaseStyle {
     technique: "extruded-line";
     shading: "standard";
-    attr?: Partial<StandardExtrudedLineTechniqueParams>;
+    attr?: Attr<StandardExtrudedLineTechniqueParams>;
 }
 
 /**
@@ -301,17 +350,17 @@ export interface StandardExtrudedLineStyle extends BaseStyle {
  */
 export interface ExtrudedPolygonStyle extends BaseStyle {
     technique: "extruded-polygon";
-    attr?: Partial<ExtrudedPolygonTechniqueParams>;
+    attr?: Attr<ExtrudedPolygonTechniqueParams>;
 }
 
 export interface ShaderStyle extends BaseStyle {
     technique: "shader";
-    attr?: Partial<ShaderTechniqueParams>;
+    attr?: Attr<ShaderTechniqueParams>;
 }
 
 export interface TextTechniqueStyle extends BaseStyle {
     technique: "text";
-    attr?: Partial<TextTechniqueParams>;
+    attr?: Attr<TextTechniqueParams>;
 }
 
 export interface NoneStyle extends BaseStyle {
