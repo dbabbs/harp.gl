@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Theme } from "@here/harp-datasource-protocol";
+import { isReference, isValueDefinition, Theme } from "@here/harp-datasource-protocol/lib/Theme";
 import "@here/harp-fetch";
 import { composeUrlResolvers, defaultUrlResolver, resolveReferenceUrl } from "@here/harp-utils";
 
@@ -20,8 +20,9 @@ export class ThemeLoader {
      * (see: https://www.w3.org/TR/WD-html40-970917/htmlweb.html#h-5.1.2).
      *
      * @param themeUrl The URL to the theme.
+     * @param expand A boolean to control if references should be expanded.
      */
-    static async loadAsync(themeUrl: string): Promise<Theme> {
+    static async loadAsync(themeUrl: string, expand: boolean = true): Promise<Theme> {
         themeUrl = defaultUrlResolver(themeUrl);
 
         const response = await fetch(themeUrl);
@@ -35,7 +36,13 @@ export class ThemeLoader {
         // Remember the URL where the theme has been loaded from.
         theme.url = themeUrl;
 
-        return this.resolveUrls(theme);
+        const resolvedTheme = this.resolveUrls(theme);
+
+        if (expand) {
+            return this.preprocess(await resolvedTheme);
+        }
+
+        return resolvedTheme;
     }
 
     /**
@@ -96,5 +103,97 @@ export class ThemeLoader {
             }
         }
         return theme;
+    }
+
+    static async preprocess(theme: Theme): Promise<Theme> {
+        const result = await this.resolve(theme);
+
+        if (result.styles === undefined) {
+            return result;
+        }
+
+        if (result.definitions === undefined) {
+            return result;
+        }
+
+        const defs = result.definitions;
+
+        function hasOwnProperty(obj: any, name: string) {
+            return Object.prototype.hasOwnProperty.call(obj, name);
+        }
+
+        for (const styleSetName in result.styles) {
+            if (!hasOwnProperty(result.styles, styleSetName)) {
+                continue;
+            }
+
+            const styleSet = result.styles[styleSetName];
+
+            styleSet.forEach((currentStyle, index) => {
+                let style = currentStyle;
+
+                if (isReference(style)) {
+                    // expand and instantiate references to style definitions.
+
+                    const def = defs[style.$ref];
+
+                    if (isValueDefinition(def)) {
+                        // a style definition is required but a value is found, skip it.
+                        return;
+                    }
+
+                    // instantiate the style
+                    style = JSON.parse(JSON.stringify(def));
+                    delete (style as any).$ref;
+                    styleSet[index] = { ...styleSet[index], ...style } as any;
+                }
+
+                if (style.attr === undefined) {
+                    // nothing to do.
+                    return;
+                }
+
+                const attr = style.attr as any;
+
+                for (const prop in attr) {
+                    if (!hasOwnProperty(attr, prop)) {
+                        continue;
+                    }
+
+                    const value = attr[prop];
+
+                    if (!isReference(value)) {
+                        continue; // nothing to do
+                    }
+
+                    const def = defs[value.$ref];
+
+                    if (def === undefined || !isValueDefinition(def)) {
+                        delete attr[prop];
+                        continue; // unresolved property, warn the user.
+                    }
+
+                    attr[prop] = def.value;
+                }
+            });
+        }
+        return result;
+    }
+
+    static async resolve(theme: Theme, depth = 0): Promise<Theme> {
+        if (theme.extends === undefined) {
+            return theme;
+        }
+
+        if (depth > 3) {
+            return theme;
+        }
+
+        const extendedThemeUrl = theme.extends;
+        delete theme.extends;
+        const extendedTheme = await ThemeLoader.loadAsync(extendedThemeUrl, false);
+        const definitions = { ...extendedTheme.definitions, ...theme.definitions };
+        const styles = { ...extendedTheme.styles, ...theme.styles };
+        return this.resolve({ ...extendedTheme, ...theme, definitions, styles }, depth + 1);
     }
 }

@@ -1,5 +1,47 @@
 {
-    "definitions": [{ "name": "parkColor", "value": "#6C9478" }],
+    "definitions": {
+        "parkColor": {
+            "type": "color",
+            "value": "#6C9478"
+        },
+
+        "extrudedBuildings": {
+            "description": "building_geometry",
+            "technique": "extruded-polygon",
+            "attr": {
+                "color": "#EDE7E1",
+                "opacity": 0.9,
+                "roughness": 1,
+                "metalness": 0.8,
+                "emissive": "#78858C",
+                "emissiveIntensity": 0.85,
+                "footprint": true,
+                "maxSlope": 0.8799999999999999,
+                "lineWidth": 1,
+                "lineColor": "#172023",
+                "lineColorMix": 0.6,
+                "fadeNear": 0.9,
+                "fadeFar": 1,
+                "lineFadeNear": -0.75,
+                "lineFadeFar": 1,
+                "animateExtrusion": {
+                    "interpolation": "Discrete",
+                    "zoomLevels": [14, 15],
+                    "values": [false, true]
+                }
+            },
+            "renderOrder": 2000
+        },
+
+        "countryBorderLineWidth": {
+            "type": "number",
+            "value": {
+                "interpolation": "Linear",
+                "zoomLevels": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+                "values": [2000, 1400, 1000, 500, 220, 90, 50, 30, 20, 15, 10, 5, 2]
+            }
+        }
+    },
     "sky": {
         "type": "gradient",
         "colorTop": "#015EBB",
@@ -651,11 +693,7 @@
                 "technique": "solid-line",
                 "attr": {
                     "color": "#2F444B",
-                    "lineWidth": {
-                        "interpolation": "Linear",
-                        "zoomLevels": [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-                        "values": [2000, 1400, 1000, 500, 220, 90, 50, 30, 20, 15, 10, 5, 2]
-                    }
+                    "lineWidth": { "$ref": "countryBorderLineWidth" }
                 },
                 "renderOrder": 4.1
             },
@@ -825,7 +863,9 @@
                 "when": "$layer ^= 'landuse' && (($geometryType ^= 'polygon') && kind in ['nature','forest','park','wood','natural_wood','grass','meadow','village_green','dog_park','garden','nature_reserve','protected_area'])",
                 "technique": "fill",
                 "attr": {
-                    "color": { "$ref": "parkColor" }
+                    "color": {
+                        "$ref": "parkColor"
+                    }
                 },
                 "renderOrder": 0.2
             },
@@ -1211,32 +1251,8 @@
                 "final": true
             },
             {
-                "description": "building_geometry",
-                "when": "$layer ^= 'buildings' && ($geometryType ^= 'polygon')",
-                "technique": "extruded-polygon",
-                "attr": {
-                    "color": "#EDE7E1",
-                    "opacity": 0.9,
-                    "roughness": 1,
-                    "metalness": 0.8,
-                    "emissive": "#78858C",
-                    "emissiveIntensity": 0.85,
-                    "footprint": true,
-                    "maxSlope": 0.8799999999999999,
-                    "lineWidth": 1,
-                    "lineColor": "#172023",
-                    "lineColorMix": 0.6,
-                    "fadeNear": 0.9,
-                    "fadeFar": 1,
-                    "lineFadeNear": -0.75,
-                    "lineFadeFar": 1,
-                    "animateExtrusion": {
-                        "interpolation": "Discrete",
-                        "zoomLevels": [14, 15],
-                        "values": [false, true]
-                    }
-                },
-                "renderOrder": 2000
+                "when": "$layer == 'buildings' && $geometryType == 'polygon'",
+                "$ref": "extrudedBuildings"
             },
             {
                 "description": "building_address",

@@ -55,6 +55,7 @@ export namespace GlobeExample {
         });
 
         map.addDataSource(omvDataSource);
+        omvDataSource.addTileBackground = false;
 
         const controls = new GlobeControls(map);
         controls.enabled = true;

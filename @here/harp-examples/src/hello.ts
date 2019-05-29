@@ -67,7 +67,8 @@ export namespace HelloWorldExample {
         // snippet:harp_gl_hello_world_example_1.ts
         const map = new MapView({
             canvas,
-            theme: "resources/berlin_tilezen_base.json"
+            //theme: "resources/berlin_tilezen_base.json"
+            theme: "resources/berlin_derived.json"
         });
         // end:harp_gl_hello_world_example_1.ts
 
