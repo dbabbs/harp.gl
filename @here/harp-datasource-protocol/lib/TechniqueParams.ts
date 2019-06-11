@@ -18,7 +18,7 @@ export interface BaseTechniqueParams {
     /**
      * The render order of the objects created using this technique.
      *
-     * If not specified in style file, [[StyleSetEvaluator]] will assign monotonicaly increasing
+     * If not specified in style file, [[StyleSetEvaluator]] will assign monotonically increasing
      * values according to style position in file.
      */
     renderOrder: number;
