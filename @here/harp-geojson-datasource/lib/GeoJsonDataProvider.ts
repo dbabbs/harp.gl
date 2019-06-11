@@ -21,11 +21,17 @@ export class GeoJsonDataProvider implements DataProvider {
      * Constructs a new `GeoJsonDataProvider`.
      *
      * @param input URL of the GeoJSON, or a GeoJSON.
+     * @param tiler ITiler
      *
      * @returns New `GeoJsonDataProvider`.
      */
-    constructor(readonly name: string, public input: URL | GeoJson, workerTilerUrl?: string) {
-        this.m_tiler = ConcurrentTilerFacade.getTiler("omv-tiler", workerTilerUrl);
+    constructor(
+        readonly name: string,
+        public input: URL | GeoJson,
+        workerTilerUrl?: string,
+        tiler?: ITiler
+    ) {
+        this.m_tiler = tiler || ConcurrentTilerFacade.getTiler("omv-tiler", workerTilerUrl);
     }
 
     async connect(): Promise<void> {

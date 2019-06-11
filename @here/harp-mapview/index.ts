@@ -44,3 +44,4 @@ export * from "./lib/VisibleTileSet";
 export * from "./lib/WorkerBasedDecoder";
 export * from "./lib/WorkerBasedTiler";
 export * from "./lib/workers/WorkerLoader";
+export * from "./lib/GeoJsonTiler";
