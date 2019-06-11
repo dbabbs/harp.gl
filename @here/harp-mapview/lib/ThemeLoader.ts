@@ -82,6 +82,7 @@ export class ThemeLoader {
         }
 
         if (theme.styles) {
+            let globalThemeIndex = 0;
             for (const styleSetName in theme.styles) {
                 if (!theme.styles.hasOwnProperty(styleSetName)) {
                     continue;

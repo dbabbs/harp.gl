@@ -178,6 +178,12 @@ export interface IndexedTechniqueParams {
      * @hidden
      */
     _index: number;
+
+    /**
+     * Optimization: Index into [[StyleSet]] in [[StyleSetEvaluator]].
+     * @hidden
+     */
+    _styleSetIndex: number;
 }
 
 /**
