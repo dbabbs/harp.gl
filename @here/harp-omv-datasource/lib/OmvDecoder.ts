@@ -53,7 +53,7 @@ import { VTJsonDataAdapter } from "./VTJsonDataAdapter";
 const logger = LoggerManager.instance.create("OmvDecoder", { enabled: false });
 
 export class Ring {
-    readonly isOuterRing: boolean;
+    readonly winding: number;
 
     /**
      * Constructs a new [[Ring]].
@@ -70,11 +70,7 @@ export class Ring {
         readonly contourOutlines?: boolean[],
         readonly points: number[] = contour
     ) {
-        this.isOuterRing = this.area() < 0;
-    }
-
-    get isInnerRing(): boolean {
-        return !this.isOuterRing;
+        this.winding = Math.sign(this.area());
     }
 
     area(): number {
